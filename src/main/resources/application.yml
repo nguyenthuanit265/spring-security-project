@@ -1,0 +1,9 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: spring-security-project
+logging:
+  level:
+    com.security: DEBUG
+    org.springframework.security: DEBUG
