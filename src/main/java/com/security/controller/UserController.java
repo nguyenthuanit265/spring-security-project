@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     @GetMapping("/profiles")
     public ResponseEntity<?> userProfile(HttpServletRequest request) {
-        return new ResponseEntity<>("User profile", HttpStatus.OK);
+        return new ResponseEntity<>("User request", HttpStatus.OK);
     }
 }

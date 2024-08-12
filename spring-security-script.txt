@@ -1,0 +1,8 @@
+ - Docker run MYSQL
+ - Tạo database
+ - Tạo class mapping entity - User, Role
+ - Tạo UserRepository
+ - Tạo UserService + Impl
+ - Tạo DTO Request AuthRequest, SignUpRequest
+ - Tạo AuthController
+ - Cấu hình filterChain, tạo CustomUserDetailsServiceImpl
