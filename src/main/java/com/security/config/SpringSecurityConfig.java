@@ -91,7 +91,7 @@ public class SpringSecurityConfig {
                 .authenticationManager(authenticationManager());
 
         // In your SecurityConfig
-        http.addFilterBefore(new JsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

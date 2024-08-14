@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(modelMapper.map(saved, UserDto.class), HttpStatus.CREATED);
     }
 
+    @jakarta.transaction.Transactional
     @Override
     public Optional<SpringSecurityUserDetailsDto> findByUsername(String username) {
         if (ObjectUtils.isEmpty(username)) {
