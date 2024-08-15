@@ -1,5 +1,6 @@
 package com.security.controller;
 
+import com.security.model.base.AppResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     @GetMapping("/profiles")
     public ResponseEntity<?> adminProfile(HttpServletRequest request) {
-        return new ResponseEntity<>("Admin request", HttpStatus.OK);
+        return new ResponseEntity<>(AppResponse.buildResponse(HttpStatus.OK, "Admin request"), HttpStatus.OK);
     }
 }

@@ -1,7 +1,9 @@
 package com.security.controller;
 
 import com.security.config.JwtTokenProvider;
+import com.security.model.base.AppResponse;
 import com.security.model.dto.AuthRequest;
+import com.security.model.dto.AuthResponse;
 import com.security.model.dto.SignUpRequest;
 import com.security.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,8 +52,10 @@ public class AuthController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = jwtTokenProvider.generateToken(authentication);
-
-        return new ResponseEntity<>(jwt, HttpStatus.OK);
+        // String jwt = jwtTokenProvider.generateToken(authentication);
+        String jwt = jwtTokenProvider.generateAccessToken(authentication);
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setAccessToken(jwt);
+        return new ResponseEntity<>(AppResponse.buildResponse(HttpStatus.OK, authResponse), HttpStatus.OK);
     }
 }

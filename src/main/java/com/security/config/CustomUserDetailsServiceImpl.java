@@ -12,10 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(value = "customUserDetailsService")
@@ -38,6 +36,14 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         }
         org.springframework.security.core.userdetails.User.UserBuilder userByEmailBuilder = org.springframework.security.core.userdetails.User.withUsername(user.get().getEmail())
                 .password(user.get().getPassword());
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(new Role("ROLE_USER", "USER"));
+        List<GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getCode()))
+                .collect(Collectors.toList());
+        userByEmailBuilder.authorities(authorities);
+
 //        if (!CollectionUtils.isEmpty(user.get().getRoles())) {
 //            userByEmailBuilder.authorities(getAuthorities(user.get().getRoles()));
 //        }

@@ -29,11 +29,19 @@ public class SpringSecurityConfig {
     private final Logger LOGGER = LoggerFactory.getLogger(SpringSecurityConfig.class);
     private final UserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SpringSecurityConfig(@Qualifier("customUserDetailsService") UserDetailsService customUserDetailsService,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                                CustomAccessDeniedHandler customAccessDeniedHandler, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customUserDetailsService = customUserDetailsService;
         this.passwordEncoder = passwordEncoder;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -77,12 +85,14 @@ public class SpringSecurityConfig {
         // Config router
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/sign-up").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/sign-up", "/api/v1/auth/login").permitAll()
+                        // .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
 
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/public").permitAll()
-                        .requestMatchers("/api/v1/users/profiles").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/v1/admins/profiles").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/users/**").hasRole("USER")
+                        .requestMatchers("/api/v1/mod/**").hasRole("MODERATOR")
+                        .requestMatchers("/api/v1/admins/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -91,8 +101,12 @@ public class SpringSecurityConfig {
                 .authenticationManager(authenticationManager());
 
         // In your SecurityConfig
-        http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        // Config Exception handler
+        http.exceptionHandling(e -> e
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler));
         return http.build();
     }
 }

@@ -93,6 +93,23 @@ public class JwtTokenProvider {
         }
     }
 
+    public String generateAccessToken(Authentication authentication) {
+        try {
+            UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+
+            return Jwts.builder()
+                    .setSubject(String.format("%s", userPrincipal.getUsername()))
+                    .setIssuer(userPrincipal.getUsername())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
+                    .signWith(getSignInKey(), SignatureAlgorithm.HS512)
+                    .compact();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+
     public Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
