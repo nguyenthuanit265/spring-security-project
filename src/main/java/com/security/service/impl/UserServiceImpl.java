@@ -1,6 +1,8 @@
 package com.security.service.impl;
 
 
+import com.security.appexception.ResourceNotFoundException;
+import com.security.model.base.AppResponse;
 import com.security.model.dto.SignUpRequest;
 import com.security.model.dto.SpringSecurityUserDetailsDto;
 import com.security.model.dto.UserDto;
@@ -68,5 +70,12 @@ public class UserServiceImpl implements UserService {
             return Optional.ofNullable(SpringSecurityUserDetailsDto.builder().id(user.get().getId()).email(user.get().getEmail()).name(user.get().getName()).build());
         }
         return Optional.empty();
+    }
+
+    @Override
+    public ResponseEntity<?> getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return new ResponseEntity<>(AppResponse.buildResponse(HttpStatus.OK, modelMapper.map(user, UserDto.class)), HttpStatus.OK);
     }
 }

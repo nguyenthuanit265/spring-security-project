@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SpringSecurityConfig {
     private final Logger LOGGER = LoggerFactory.getLogger(SpringSecurityConfig.class);
     private final UserDetailsService customUserDetailsService;
@@ -91,7 +93,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/public").permitAll()
                         .requestMatchers("/api/v1/users/**").hasRole("USER")
-                        .requestMatchers("/api/v1/mod/**").hasRole("MODERATOR")
+                        .requestMatchers("/api/v1/users/mod/**").hasRole("MODERATOR")
                         .requestMatchers("/api/v1/admins/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

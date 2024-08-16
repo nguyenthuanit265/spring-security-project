@@ -19,6 +19,7 @@ public class AppResponse {
     private String path;
     private String error;
     private String message;
+    private String details;
     private String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
     private int status;
     private Object data;
@@ -39,5 +40,10 @@ public class AppResponse {
         res.setMessage(httpStatus.name());
         res.setData(data);
         return res;
+    }
+
+    public AppResponse(String message, String details) {
+        this.message = message;
+        this.details = details;
     }
 }
