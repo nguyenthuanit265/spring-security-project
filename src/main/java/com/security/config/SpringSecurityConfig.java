@@ -80,7 +80,7 @@ public class SpringSecurityConfig {
         LOGGER.info("BEAN filterChain");
 
         // Config CSRF, XSS, Click jacking and so on
-        http.csrf(AbstractHttpConfigurer::disable);
+//        http.csrf(AbstractHttpConfigurer::disable);
 
 //        http.httpBasic(Customizer.withDefaults());
 
