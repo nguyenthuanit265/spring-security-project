@@ -1,9 +1,12 @@
 package com.security.config;
 
+import com.nimbusds.jose.shaded.gson.Gson;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,13 +19,17 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtTokenProvider jwtTokenProvider;
-
     private final CustomUserDetailsServiceImpl customUserDetailsService;
+    private final Gson gson;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailsServiceImpl customUserDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   CustomUserDetailsServiceImpl customUserDetailsService,
+                                   Gson gson) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserDetailsService = customUserDetailsService;
+        this.gson = gson;
     }
 
     private boolean hasAuthorizationBearer(HttpServletRequest request) {
@@ -65,6 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         }
 
+        LOGGER.info("JWT Authentication completed. User: {}", gson.toJson(SecurityContextHolder.getContext().getAuthentication()));
         filterChain.doFilter(request, response);
     }
 

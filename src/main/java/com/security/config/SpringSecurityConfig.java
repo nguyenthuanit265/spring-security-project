@@ -1,6 +1,8 @@
 package com.security.config;
 
-import com.security.filter.JsonAuthenticationFilter;
+import com.security.config.custom.CustomAccessDeniedHandler;
+import com.security.config.custom.CustomAuthenticationEntryPoint;
+import com.security.config.custom.CustomDefaultAccessDeniedHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +25,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,16 +42,18 @@ public class SpringSecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomDefaultAccessDeniedHandler customDefaultAccessDeniedHandler;
 
     public SpringSecurityConfig(@Qualifier("customUserDetailsService") UserDetailsService customUserDetailsService,
                                 PasswordEncoder passwordEncoder,
                                 CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-                                CustomAccessDeniedHandler customAccessDeniedHandler, JwtAuthenticationFilter jwtAuthenticationFilter) {
+                                CustomAccessDeniedHandler customAccessDeniedHandler, JwtAuthenticationFilter jwtAuthenticationFilter, CustomDefaultAccessDeniedHandler customDefaultAccessDeniedHandler) {
         this.customUserDetailsService = customUserDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customDefaultAccessDeniedHandler = customDefaultAccessDeniedHandler;
     }
 
     @Bean
@@ -106,7 +116,11 @@ public class SpringSecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Config Exception handler
+        List<RequestMatcher> defaultAccessDeniedUserPaths = new ArrayList<>();
+        defaultAccessDeniedUserPaths.add(new AntPathRequestMatcher("/api/v1/admins/board", "GET"));
+//        defaultAccessDeniedUserPaths.add(new AntPathRequestMatcher("/api/v1/admins/**"));
         http.exceptionHandling(e -> e
+                .defaultAccessDeniedHandlerFor(customDefaultAccessDeniedHandler, new AndRequestMatcher(defaultAccessDeniedUserPaths))
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .accessDeniedHandler(customAccessDeniedHandler));
         return http.build();

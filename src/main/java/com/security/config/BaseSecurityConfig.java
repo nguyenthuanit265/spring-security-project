@@ -11,4 +11,9 @@ public class BaseSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+//    @Bean
+//    public RateLimiter authenticationRateLimiter() {
+//        return RateLimiter.create(10.0); // 10 requests per second
+//    }
 }

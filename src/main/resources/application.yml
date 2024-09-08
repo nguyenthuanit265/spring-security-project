@@ -4,7 +4,7 @@ spring:
   application:
     name: spring-security-project
   datasource:
-    url: jdbc:mysql://localhost:3306/db_spring_security?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/db_spring_security
     username: root
     password: 123456
   jpa:

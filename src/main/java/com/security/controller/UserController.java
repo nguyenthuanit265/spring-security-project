@@ -1,7 +1,5 @@
 package com.security.controller;
 
-import com.security.appexception.ResourceNotFoundException;
-import com.security.model.dto.UserDto;
 import com.security.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -44,9 +42,4 @@ public class UserController {
     public ResponseEntity<?> userProfile(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-//        return userService.getUserById(id);
-//    }
 }

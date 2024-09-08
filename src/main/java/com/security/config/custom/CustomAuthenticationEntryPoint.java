@@ -1,4 +1,4 @@
-package com.security.config;
+package com.security.config.custom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
