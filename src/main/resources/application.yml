@@ -4,7 +4,7 @@ spring:
   application:
     name: spring-security-project
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: false
   datasource:
@@ -15,9 +15,12 @@ spring:
     show-sql: true
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
+        globally_quoted_identifiers: true
         generate_statistics: true
         jdbc:
           batch_size: 100

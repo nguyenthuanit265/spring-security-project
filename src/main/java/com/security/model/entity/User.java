@@ -21,9 +21,7 @@ public class User {
     private String email;
     private String password;
     private String name;
-    /**
-     * Authorization information.
-     */
+
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles",
