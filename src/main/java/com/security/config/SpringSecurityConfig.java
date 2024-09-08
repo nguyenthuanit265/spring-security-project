@@ -58,7 +58,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
-        return new ProviderManager(authenticationProvider());
+        return new ProviderManager(List.of(authenticationProvider()));
     }
 
 

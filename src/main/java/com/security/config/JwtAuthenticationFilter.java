@@ -22,14 +22,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsServiceImpl customUserDetailsService;
-    private final Gson gson;
+    private final Gson gson = new Gson();
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
-                                   CustomUserDetailsServiceImpl customUserDetailsService,
-                                   Gson gson) {
+                                   CustomUserDetailsServiceImpl customUserDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserDetailsService = customUserDetailsService;
-        this.gson = gson;
     }
 
     private boolean hasAuthorizationBearer(HttpServletRequest request) {

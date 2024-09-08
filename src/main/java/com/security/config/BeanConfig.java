@@ -13,8 +13,8 @@ public class BeanConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public Gson gson() {
-        return new Gson();
-    }
+//    @Bean
+//    public Gson gson() {
+//        return new Gson();
+//    }
 }

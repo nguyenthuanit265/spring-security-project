@@ -27,9 +27,9 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "userId",
+            joinColumns = @JoinColumn(name = "user_id",
                     referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "roleId",
+            inverseJoinColumns = @JoinColumn(name = "role_id",
                     referencedColumnName = "id"))
     private Set<Role> roles;
 }
