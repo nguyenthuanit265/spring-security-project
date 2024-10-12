@@ -4,7 +4,7 @@ spring:
   application:
     name: spring-security-project
   flyway:
-    enabled: false
+    enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: false
   datasource:
