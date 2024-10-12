@@ -104,6 +104,7 @@ public class SpringSecurityConfig {
                         // .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
 
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/resources/public").permitAll()
                         .requestMatchers("/api/v1/public").permitAll()
                         .requestMatchers("/api/v1/users/**").hasRole("USER")
                         .requestMatchers("/api/v1/users/mod/**").hasRole("MODERATOR")

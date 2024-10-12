@@ -39,7 +39,15 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
 
         List<Role> roles = new ArrayList<>();
-        roles.add(new Role("ROLE_USER", "USER"));
+        if (user.get().getEmail().contains("admin")) {
+            roles.add(new Role("ROLE_ADMIN", "ADMIN"));
+        } else if (user.get().getEmail().contains("user")) {
+            roles.add(new Role("ROLE_USER", "USER"));
+        } else if (user.get().getEmail().contains("moderator")) {
+            roles.add(new Role("ROLE_MODERATOR", "MODERATOR"));
+        } else {
+            roles.add(new Role("ROLE_USER", "USER"));
+        }
 //        List<GrantedAuthority> authorities = roles.stream()
 //                .map(role -> new SimpleGrantedAuthority(role.getCode()))
 //                .collect(Collectors.toList());
