@@ -48,14 +48,69 @@ Modify the `application.properties` file in the `src/main/resources` directory t
 
 Access the application via `http://localhost:8080`. Use the provided API endpoints for authentication and user management.
 
-## Contributing
+# Mô tả chi tiết dự án Spring Security API Demo
 
-Contributions are welcome! Please fork the repository and submit a pull request.
+## 1. Tổng quan
 
-## License
+Dự án này là một demo nhỏ về việc triển khai bảo mật cho REST API sử dụng Spring Security. Nó minh họa cách xác thực người dùng, quản lý phiên đăng nhập bằng JWT (JSON Web Tokens), và kiểm soát quyền truy cập vào các tài nguyên dựa trên vai trò của người dùng.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 2. Công nghệ sử dụng
 
----
+- Spring Boot
+- Spring Security
+- JSON Web Tokens (JWT)
+- RESTful API
+- Java
 
-This README provides an overview of the project, installation instructions, and other essential details. Feel free to customize it based on any specific details or additional features of your project.
+## 3. Cấu trúc API
+
+### 3.1 Endpoints công khai
+
+- `GET /api/v1/resources/public`: Truy cập tài nguyên công khai
+- `GET /api/v1/public`: Một endpoint công khai khác
+
+### 3.2 Endpoints xác thực
+
+- `POST /api/v1/auth/sign-up`: Đăng ký người dùng mới
+- `POST /api/v1/auth/login`: Đăng nhập và nhận token JWT
+
+### 3.3 Endpoints người dùng
+
+- `GET /api/v1/users/content`: Lấy nội dung dành cho người dùng đã xác thực
+- `GET /api/v1/users/{id}`: Lấy thông tin profile của người dùng theo ID
+
+### 3.4 Endpoints admin
+
+- `GET /api/v1/admins/profiles`: Lấy thông tin profile của admin
+- `GET /api/v1/admins/board`: Truy cập bảng điều khiển admin
+
+## 4. Luồng xác thực và ủy quyền
+
+1. Người dùng đăng ký tài khoản thông qua endpoint đăng ký.
+2. Người dùng đăng nhập và nhận được JWT.
+3. Các yêu cầu tiếp theo đến các endpoint được bảo vệ phải bao gồm JWT trong header "Authorization".
+4. Server xác thực JWT và kiểm tra quyền của người dùng trước khi cho phép truy cập vào tài nguyên.
+
+## 5. Bảo mật
+
+- Sử dụng JWT để quản lý phiên đăng nhập, tránh lưu trữ thông tin phiên trên server.
+- Phân quyền dựa trên vai trò (ROLE_USER, ROLE_ADMIN).
+- Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu.
+- Sử dụng HTTPS để bảo vệ dữ liệu trong quá trình truyền tải (được giả định).
+
+## 6. Xử lý lỗi
+
+- Trả về mã lỗi HTTP phù hợp (ví dụ: 403 Forbidden) khi truy cập không được phép.
+- Cung cấp thông báo lỗi chi tiết trong response body.
+
+## 7. Hướng phát triển tiếp theo
+
+- Thêm tính năng làm mới token (refresh token).
+- Triển khai xác thực hai yếu tố (2FA).
+- Tích hợp với các dịch vụ xác thực bên thứ ba (OAuth2, OpenID Connect).
+- Thêm rate limiting để ngăn chặn tấn công brute-force.
+- Triển khai logging và monitoring để theo dõi các hoạt động đáng ngờ.
+
+## 8. Kết luận
+
+Dự án demo này cung cấp một nền tảng vững chắc để xây dựng các ứng dụng web bảo mật sử dụng Spring Security. Nó minh họa các khái niệm cơ bản về xác thực, ủy quyền và bảo vệ API, đồng thời cung cấp cơ sở để mở rộng và tùy chỉnh cho các ứng dụng phức tạp hơn.
