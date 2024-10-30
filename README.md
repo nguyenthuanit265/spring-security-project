@@ -102,11 +102,3 @@ Dự án này là một demo nhỏ về việc triển khai bảo mật cho REST
 
 - Trả về mã lỗi HTTP phù hợp (ví dụ: 403 Forbidden) khi truy cập không được phép.
 - Cung cấp thông báo lỗi chi tiết trong response body.
-
-## 7. Hướng phát triển tiếp theo
-
-- Thêm tính năng làm mới token (refresh token).
-- Triển khai xác thực hai yếu tố (2FA).
-- Tích hợp với các dịch vụ xác thực bên thứ ba (OAuth2, OpenID Connect).
-- Thêm rate limiting để ngăn chặn tấn công brute-force.
-- Triển khai logging và monitoring để theo dõi các hoạt động đáng ngờ.
