@@ -110,7 +110,3 @@ Dự án này là một demo nhỏ về việc triển khai bảo mật cho REST
 - Tích hợp với các dịch vụ xác thực bên thứ ba (OAuth2, OpenID Connect).
 - Thêm rate limiting để ngăn chặn tấn công brute-force.
 - Triển khai logging và monitoring để theo dõi các hoạt động đáng ngờ.
-
-## 8. Kết luận
-
-Dự án demo này cung cấp một nền tảng vững chắc để xây dựng các ứng dụng web bảo mật sử dụng Spring Security. Nó minh họa các khái niệm cơ bản về xác thực, ủy quyền và bảo vệ API, đồng thời cung cấp cơ sở để mở rộng và tùy chỉnh cho các ứng dụng phức tạp hơn.
