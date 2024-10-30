@@ -56,6 +56,7 @@ public class AuthController {
         String jwt = jwtTokenProvider.generateAccessToken(authentication);
         AuthResponse authResponse = new AuthResponse();
         authResponse.setAccessToken(jwt);
+        authResponse.setEmail(request.getEmail());
         return new ResponseEntity<>(AppResponse.buildResponse(HttpStatus.OK, authResponse), HttpStatus.OK);
     }
 }

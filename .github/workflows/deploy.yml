@@ -1,0 +1,94 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE: nguyenthuanit265/app-spring-security
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+      - name: Create application.yml
+        run: |
+          mkdir -p src/main/resources
+          cat > src/main/resources/application.yml << EOF
+          server:
+            port: ${{ secrets.SERVER_PORT }}
+          spring:
+            application:
+              name: spring-security-project
+            flyway:
+              enabled: false
+              locations: classpath:db/migration
+              baseline-on-migrate: false
+            datasource:
+              url: jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
+              username: ${{ secrets.DB_USERNAME }}
+              password: ${{ secrets.DB_PASSWORD }}
+            jpa:
+              show-sql: true
+              open-in-view: true
+              hibernate:
+                ddl-auto: none
+                naming:
+                  physical-strategy: com.security.config.db.CustomNamingStrategy
+              properties:
+                hibernate:
+                  globally_quoted_identifiers: true
+                  generate_statistics: true
+                  jdbc:
+                    batch_size: 100
+                  cache:
+                    use_second_level_cache: false
+                  format_sql: true
+          logging:
+            level:
+              com:
+                security: DEBUG
+              org:
+                springframework:
+                  security: DEBUG
+          EOF
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $DOCKER_IMAGE:${{ github.sha }} .
+          docker push $DOCKER_IMAGE:${{ github.sha }}
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            docker stop app-container-spring-security || true
+            docker rm app-container-spring-security || true
+            docker run -d \
+              --name app-container-spring-security \
+              -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
+              -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
