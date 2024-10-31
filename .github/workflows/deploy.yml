@@ -83,6 +83,15 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Create Docker network if it doesn't exist
+            docker network create my-network-1 || true
+
+            # Stop and remove existing MySQL container
+            docker stop some-mysql || true
+            docker rm some-mysql || true
+
+            docker run --name some-mysql --network my-network-1 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=db_spring_security -d -p 3306:3306 -v mysql-data:/var/lib/mysql mysql
+            
             # Pull the new image
             docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
             
