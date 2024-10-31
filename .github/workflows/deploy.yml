@@ -76,8 +76,8 @@ jobs:
           docker build -t $DOCKER_IMAGE:${{ github.sha }} .
           docker push $DOCKER_IMAGE:${{ github.sha }}
           
-      - name: Remove application.yml
-        run: rm -f src/main/resources/application.yml
+      # - name: Remove application.yml
+      #   run: rm -f src/main/resources/application.yml
         
       - name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -92,7 +92,7 @@ jobs:
             docker run -d \
               --name app-container-spring-security \
               -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
-              -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+              -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false \
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
               ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
