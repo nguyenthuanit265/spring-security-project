@@ -86,10 +86,4 @@ jobs:
             docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
             docker stop app-container-spring-security || true
             docker rm app-container-spring-security || true
-            docker run -d \
-              --name app-container-spring-security \
-              -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
-              -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false \
-              -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            docker run -d --name app-container-spring-security -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false" -e SPRING_DATASOURCE_USERNAME="${{ secrets.DB_USERNAME }}" -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
