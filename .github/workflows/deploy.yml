@@ -75,7 +75,7 @@ jobs:
         run: |
           docker build -t $DOCKER_IMAGE:${{ github.sha }} .
           docker push $DOCKER_IMAGE:${{ github.sha }}
-          
+
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
@@ -83,7 +83,67 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Create Docker network if it doesn't exist
+            docker network create my-network-1 || true
+
+            # Stop and remove existing MySQL container
+            docker stop some-mysql || true
+            docker rm some-mysql || true
+
+            docker run --name some-mysql --network my-network-1 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=db_spring_security -d -p 3306:3306 -v mysql-data:/var/lib/mysql mysql
+            
+            # Pull the new image
             docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            
+            # Stop and remove the existing container
             docker stop app-container-spring-security || true
             docker rm app-container-spring-security || true
-            docker run -d --name app-container-spring-security -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false" -e SPRING_DATASOURCE_USERNAME="${{ secrets.DB_USERNAME }}" -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            
+            # Create Docker network if it doesn't exist
+            docker network create app-network || true
+            
+            # Check if MySQL is accessible
+            echo "Testing MySQL connection..."
+            mysql -h${{ secrets.DB_HOST }} -u${{ secrets.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} -e "SELECT 1;" ${{ secrets.DB_NAME }}
+            
+            # Run the new container
+            docker run -d \
+              --name app-container-spring-security \
+              --network app-network \
+              -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000" \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT="org.hibernate.dialect.MySQLDialect" \
+              -e SPRING_JPA_HIBERNATE_DDL_AUTO=none \
+              -e SPRING_JPA_SHOW_SQL=true \
+              -e SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5 \
+              -e SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=2 \
+              -e SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=30000 \
+              -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
+              ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            
+            # Wait for container to start
+            sleep 15
+            
+            # Check container logs
+            echo "Container Logs:"
+            docker logs app-container-spring-security
+            
+            # Verify container is running and healthy
+            if ! docker ps | grep -q app-container-spring-security; then
+              echo "Container failed to start"
+              docker logs app-container-spring-security
+              exit 1
+            fi
+      # - name: Deploy to server
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     username: ${{ secrets.SERVER_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+      #       docker stop app-container-spring-security || true
+      #       docker rm app-container-spring-security || true
+      #       docker run -d --name app-container-spring-security -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false" -e SPRING_DATASOURCE_USERNAME="${{ secrets.DB_USERNAME }}" -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" -e SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT="org.hibernate.dialect.MySQLDialect" -e SPRING_JPA_HIBERNATE_DDL_AUTO=none -e SPRING_JPA_SHOW_SQL=true ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+      
