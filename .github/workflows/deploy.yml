@@ -33,7 +33,7 @@ jobs:
             application:
               name: spring-security-project
             flyway:
-              enabled: true
+              enabled: false
               locations: classpath:db/migration
               baseline-on-migrate: false
             datasource:

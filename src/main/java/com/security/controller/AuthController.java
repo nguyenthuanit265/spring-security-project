@@ -5,6 +5,7 @@ import com.security.model.base.AppResponse;
 import com.security.model.dto.AuthRequest;
 import com.security.model.dto.AuthResponse;
 import com.security.model.dto.SignUpRequest;
+import com.security.model.dto.UserDto;
 import com.security.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -52,9 +55,10 @@ public class AuthController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // String jwt = jwtTokenProvider.generateToken(authentication);
         String jwt = jwtTokenProvider.generateAccessToken(authentication);
+        Optional<UserDto> optUser = userService.findByEmail(request.getEmail());
         AuthResponse authResponse = new AuthResponse();
+        optUser.ifPresent(userDto -> authResponse.setId(userDto.getId()));
         authResponse.setAccessToken(jwt);
         authResponse.setEmail(request.getEmail());
         return new ResponseEntity<>(AppResponse.buildResponse(HttpStatus.OK, authResponse), HttpStatus.OK);

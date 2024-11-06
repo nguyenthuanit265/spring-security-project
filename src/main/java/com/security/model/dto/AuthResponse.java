@@ -12,6 +12,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
+    private Long id;
     private String email;
     private String name;
     private String accessToken;
