@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> signUp(SignUpRequest request, HttpServletRequest servletRequest) {
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
         if (optionalUser.isPresent()) {
-            return new ResponseEntity<>("User is existed", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(AppResponse.buildResponse("", "", "User is existed in system, please sign up with the other email", HttpStatus.BAD_REQUEST.value(), request), HttpStatus.BAD_REQUEST);
         }
         User user = new User();
         user.setEmail(request.getEmail());

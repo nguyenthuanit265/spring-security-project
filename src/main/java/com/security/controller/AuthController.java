@@ -45,6 +45,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request, HttpServletRequest req) {
+
+        Optional<UserDto> optUser = userService.findByEmail(request.getEmail());
+        if (optUser.isEmpty()) {
+            return new ResponseEntity<>(AppResponse.buildResponse("", "", "User is not exist in system, please sign up", HttpStatus.UNAUTHORIZED.value(), request), HttpStatus.UNAUTHORIZED);
+        }
+
         // Spring Security use authenticate function -> call functions loadUserByUsername and get username and password -> using PasswordEncoder Bean authenticate user login
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -56,7 +62,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtTokenProvider.generateAccessToken(authentication);
-        Optional<UserDto> optUser = userService.findByEmail(request.getEmail());
+
         AuthResponse authResponse = new AuthResponse();
         optUser.ifPresent(userDto -> authResponse.setId(userDto.getId()));
         authResponse.setAccessToken(jwt);
