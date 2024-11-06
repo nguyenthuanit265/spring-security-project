@@ -4,9 +4,9 @@ spring:
   application:
     name: spring-security-project
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
-    baseline-on-migrate: true
+    baseline-on-migrate: false
   datasource:
     url: jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: ${{ secrets.DB_USERNAME }}
