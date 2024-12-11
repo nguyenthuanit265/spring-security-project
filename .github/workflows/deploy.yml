@@ -37,7 +37,7 @@ jobs:
               locations: classpath:db/migration
               baseline-on-migrate: false
             datasource:
-              url: jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
+              url: jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
               username: ${{ secrets.DB_USERNAME }}
               password: ${{ secrets.DB_PASSWORD }}
               driver-class-name: com.mysql.cj.jdbc.Driver
@@ -135,15 +135,3 @@ jobs:
               docker logs app-container-spring-security
               exit 1
             fi
-      # - name: Deploy to server
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-      #       docker stop app-container-spring-security || true
-      #       docker rm app-container-spring-security || true
-      #       docker run -d --name app-container-spring-security -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false" -e SPRING_DATASOURCE_USERNAME="${{ secrets.DB_USERNAME }}" -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" -e SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT="org.hibernate.dialect.MySQLDialect" -e SPRING_JPA_HIBERNATE_DDL_AUTO=none -e SPRING_JPA_SHOW_SQL=true ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-      
