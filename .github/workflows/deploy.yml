@@ -83,24 +83,12 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Create Docker network if it doesn't exist
-            docker network create my-network-1 || true
-
-            # Stop and remove existing MySQL container
-            docker stop some-mysql || true
-            docker rm some-mysql || true
-
-            docker run --name some-mysql --network my-network-1 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=db_spring_security -d -p 3306:3306 -v mysql-data:/var/lib/mysql mysql
-            
             # Pull the new image
             docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
             
             # Stop and remove the existing container
             docker stop app-container-spring-security || true
             docker rm app-container-spring-security || true
-            
-            # Create Docker network if it doesn't exist
-            docker network create app-network || true
             
             # Check if MySQL is accessible
             echo "Testing MySQL connection..."
@@ -109,7 +97,7 @@ jobs:
             # Run the new container
             docker run -d \
               --name app-container-spring-security \
-              --network app-network \
+              --network my-network-1 \
               -e SPRING_DATASOURCE_URL="jdbc:mysql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000" \
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
